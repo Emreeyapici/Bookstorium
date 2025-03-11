@@ -33,4 +33,4 @@
 
 # Gereksinim Dağılımları
 
-1. Emre Yapıcı'nın Gereksinimleri
+1. [Emre Yapıcı'nın Gereksinimleri](Emre-Yapıcı-Gereksinimler.md)

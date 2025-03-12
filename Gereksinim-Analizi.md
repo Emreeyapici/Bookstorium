@@ -6,7 +6,7 @@
 4. Ürün Arama (Emre Yapıcı)
 5. Çıkış Yapma (Emre Yapıcı)
 6. Hesap Silme (Emre Yapıcı)
-7. Favoriye Ekleme (Emre Yapıcı)
+7. Ürünü Favoriye Ekleme (Emre Yapıcı)
 8. Sepet Güncelleme (Emre Yapıcı)
 9. Sepet Silme (Emre Yapıcı)
 10. Sipariş Verme (Emre Yapıcı)

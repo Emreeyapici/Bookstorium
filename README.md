@@ -13,7 +13,7 @@
 **Proje Ekibi:** Emre Yapıcı
 
 1. [Gereksinim Analizi](Gereksinim-Analizi.md)
-2. Durum Diyagramı
+2. [Durum Diyagramı](Durum-Diyagramı.md)
 3. Durum Senaryoları
 4. Front-End
 5. Back-End

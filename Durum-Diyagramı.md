@@ -1,2 +1,1 @@
-
-![Durum-Diyagramı-1](https://github.com/user-attachments/assets/97f79849-c508-4beb-b894-bf34db745a2e)
+![Durum-Diyagram](https://github.com/user-attachments/assets/1ff4e19f-6e6e-4080-badb-8f844d464845)

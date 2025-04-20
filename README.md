@@ -4,9 +4,9 @@
 
 **Proje Kategorisi:** E-Ticaret
 
-**Referans Uygulama:** [D&R](https://www.dr.com.tr)
+**Referans Uygulama:** [https://www.dr.com.tr](https://www.dr.com.tr)
 
-**Uygulama Adresi:** ---
+**Uygulama Adresi:** [https://bookstorium.site/](https://bookstorium.site/)
 
 **Grup Adı:** knyte
 

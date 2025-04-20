@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sepetim</title>
+  
+  <!-- Bootstrap 4.6.2 CSS -->
+  <link rel="stylesheet" href="bootstrap-4.6.2-dist/css/bootstrap.min.css">
+
+  
+  <!-- Custom CSS -->
+  <style>
+    .navbar-custom {
+      background-color: #6f42c1; /* Mor renk */
+    }
+    /* Sepet Sayfası Butonları */
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+    }
+    .btn-container .btn {
+      width: 32%; /* Butonlar arasında boşluk olacak şekilde düzenleme */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Bookstorium</a> <!-- Ana sayfaya yönlendirme -->
+      <div class="ml-auto">
+        <a href="giris.html">
+           <button class="btn btn-outline-light" type="button">Üye Ol</button>
+           <button class="btn btn-outline-light" type="button">Giriş Yap</button>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sepet İçeriği -->
+  <div class="container my-5">
+    <h2>Sepetiniz</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Ürün Adı</th>
+          <th scope="col">Fiyat</th>
+          <th scope="col">Adet</th>
+          <th scope="col">Toplam</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ürün 1</td>
+          <td>100₺</td>
+          <td>1</td>
+          <td>100₺</td>
+        </tr>
+        <tr>
+          <td>Ürün 2</td>
+          <td>150₺</td>
+          <td>1</td>
+          <td>150₺</td>
+        </tr>
+        <tr>
+          <td>Ürün 3</td>
+          <td>200₺</td>
+          <td>2</td>
+          <td>400₺</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4><strong>Toplam: 650₺</strong></h4>
+    <!-- Sepet Butonları -->
+    <div class="btn-container mt-4">
+        <button class="btn btn-success">Sipariş Ver</button>
+        <button class="btn btn-danger">Sepeti Sil</button>
+        <button class="btn btn-warning">Sepeti Güncelle</button>
+      </div>
+  </div>
+
+  <script src="bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

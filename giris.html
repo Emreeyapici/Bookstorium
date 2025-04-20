@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giriş Yap</title>
+  
+  <!-- Bootstrap 4.6.2 CSS -->
+  <link rel="stylesheet" href="bootstrap-4.6.2-dist/css/bootstrap.min.css">
+
+  <!-- Custom CSS -->
+  <style>
+    .navbar-custom {
+      background-color: #6f42c1; /* Mor renk */
+    }
+    .login-container {
+      max-width: 400px;
+      margin: 50px auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Bookstorium</a> <!-- Ana sayfaya yönlendirme -->
+    </div>
+  </nav>
+
+  <!-- Giriş Yapma Formu -->
+  <div class="login-container">
+    <h2 class="text-center mb-4">Giriş Yap</h2>
+    <form>
+      <!-- Kullanıcı Adı -->
+      <div class="form-group">
+        <label for="username">Kullanıcı Adı</label>
+        <input type="text" class="form-control" id="username" placeholder="Kullanıcı Adı" required>
+      </div>
+      <!-- Şifre -->
+      <div class="form-group">
+        <label for="password">Şifre</label>
+        <input type="password" class="form-control" id="password" placeholder="Şifre" required>
+      </div>
+      <!-- Giriş Yap Butonu -->
+      <button type="submit" class="btn btn-primary btn-block">Giriş Yap</button>
+    </form>
+    <div class="mt-3 text-center">
+      <a href="register.html">Üye Ol</a> <!-- Üye olma sayfasına link -->
+    </div>
+  </div>
+
+  <!-- Bootstrap 4.6.2 JS -->
+  <script src="bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

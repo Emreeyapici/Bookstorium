@@ -10,17 +10,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # Bu bölüm, bu işteki tüm 'run' komutlarının
-    # varsayılan olarak './backend' klasöründe çalışmasını sağlar.
-    defaults:
-      run:
-        working-directory: ./backend
-
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: List files in the repository
-    run: ls -R
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: List files for debugging
+      run: ls -R
 
     - name: Set up JDK 21
       uses: actions/setup-java@v4
@@ -30,5 +25,4 @@ jobs:
         cache: maven
 
     - name: Build with Maven
-      # Artık klasör belirtmemize gerek yok, çünkü işe zaten doğru klasörde başlıyor.
-      run: mvn -B package --file pom.xml
+      run: mvn -B package --file backend/pom.xml

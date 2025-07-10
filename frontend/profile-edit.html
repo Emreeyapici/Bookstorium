@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilimi Düzenle - Bookstorium</title>
+    <link rel="stylesheet" href="assets/bootstrap 5.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav style="background-color: #005a5b" class="navbar navbar-expand-lg shadow-lg">
+        <div class="container">
+            <a href="index.html" class="text-white navbar-brand fw-bold">
+                <img src="assets/images/Book-image.png" alt="Kitap İkonu" width="40" height="40" class="me-2">
+                Bookstorium
+            </a>
+            <div class="text-white">
+                <i class="fas fa-user-edit me-2"></i>
+                <span>Profilimi Düzenle</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card shadow-lg">
+                    <div class="card-header text-center" style="background-color: #005a5b; color: white;">
+                        <h3 class="mb-0"><i class="fas fa-user-edit me-2"></i>Profilimi Düzenle</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="profileEditForm" autocomplete="off">
+                            <div class="mb-3">
+                                <label for="editName" class="form-label">Ad Soyad</label>
+                                <input type="text" class="form-control" id="editName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editEmail" class="form-label">E-posta</label>
+                                <input type="email" class="form-control" id="editEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPassword" class="form-label">Yeni Şifre <span class="text-muted" style="font-size:0.9em;">(değiştirmek istemiyorsan boş bırak)</span></label>
+                                <input type="password" class="form-control" id="editPassword" minlength="6" placeholder="Yeni şifre">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editAddress" class="form-label">Adres</label>
+                                <textarea class="form-control" id="editAddress" rows="3" required></textarea>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success btn-lg"><i class="fas fa-save me-2"></i>Kaydet</button>
+                                <a href="index.html" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Ana Sayfaya Dön</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/bootstrap 5.3/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/javascript/profile-edit.js"></script>
+</body>
+</html> 

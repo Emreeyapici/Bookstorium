@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siparişlerim - Bookstorium</title>
+    <link rel="stylesheet" href="assets/bootstrap 5.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav style="background-color: #005a5b" class="navbar navbar-expand-lg shadow-lg">
+        <div class="container">
+            <a href="index.html" class="text-white navbar-brand fw-bold">
+                <img src="assets/images/Book-image.png" alt="Kitap İkonu" width="40" height="40" class="me-2">
+                Bookstorium
+            </a>
+            <div class="text-white">
+                <i class="fas fa-list-alt me-2"></i>
+                <span>Siparişlerim</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="order-header text-center mb-5">
+                    <h1 class="mb-3">
+                        <i class="fas fa-list-alt text-success me-2"></i>
+                        Siparişlerim
+                    </h1>
+                    <p class="text-muted">Aktif siparişlerinizi ve detaylarını buradan görebilirsiniz.</p>
+                </div>
+                <div id="ordersList">
+                    <!-- Siparişler buraya gelecek -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #005a5b;">
+                    <h5 class="modal-title text-white">Sipariş Detayı</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="orderDetailsBody">
+                    <!-- Detaylar JS ile doldurulacak -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/bootstrap 5.3/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/javascript/profile-orders.js"></script>
+</body>
+</html> 

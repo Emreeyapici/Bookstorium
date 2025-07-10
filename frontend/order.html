@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipariş Ver - Bookstorium</title>
+    <link rel="stylesheet" href="assets/bootstrap 5.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav style="background-color: #005a5b" class="navbar navbar-expand-lg shadow-lg">
+        <div class="container">
+            <a href="index.html" class="text-white navbar-brand fw-bold">
+                <img src="assets/images/Book-image.png" alt="Kitap İkonu" width="40" height="40" class="me-2">
+                Bookstorium
+            </a>
+            <div class="text-white">
+                <i class="fas fa-shopping-cart me-2"></i>
+                <span>Sipariş Onayı</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="order-header text-center mb-5">
+                    <h1 class="mb-3">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Sipariş Onayı
+                    </h1>
+                    <p class="text-muted">Siparişinizi tamamlamak için bilgilerinizi doldurun</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Sol Taraf - Sipariş Formu -->
+            <div class="col-lg-8">
+                <div class="order-form-container">
+                    <!-- Müşteri Bilgileri -->
+                    <div class="order-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-user me-2"></i>
+                            Müşteri Bilgileri
+                        </h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="customerName" class="form-label">Ad Soyad</label>
+                                <input type="text" class="form-control" id="customerName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="customerEmail" class="form-label">E-posta</label>
+                                <input type="email" class="form-control" id="customerEmail" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="customerPhone" class="form-label">Telefon</label>
+                                <input type="tel" class="form-control" id="customerPhone" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="customerTc" class="form-label">T.C. Kimlik No</label>
+                                <input type="text" class="form-control" id="customerTc" maxlength="11" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Teslimat Adresi -->
+                    <div class="order-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            Teslimat Adresi
+                        </h4>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="city" class="form-label">İl</label>
+                                <select class="form-select" id="city" required>
+                                    <option value="">İl Seçin</option>
+                                    <option value="istanbul">İstanbul</option>
+                                    <option value="ankara">Ankara</option>
+                                    <option value="izmir">İzmir</option>
+                                    <option value="bursa">Bursa</option>
+                                    <option value="antalya">Antalya</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="district" class="form-label">İlçe</label>
+                                <select class="form-select" id="district" required>
+                                    <option value="">İlçe Seçin</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="postalCode" class="form-label">Posta Kodu</label>
+                                <input type="text" class="form-control" id="postalCode" maxlength="5" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="address" class="form-label">Adres</label>
+                                <textarea class="form-control" id="address" rows="3" placeholder="Sokak, mahalle, kapı numarası..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ödeme Yöntemi -->
+                    <div class="order-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Ödeme Yöntemi
+                        </h4>
+                        <div class="payment-methods">
+                            <div class="payment-option">
+                                <input type="radio" class="form-check-input" id="creditCard" name="paymentMethod" value="creditCard" checked>
+                                <label for="creditCard" class="payment-label">
+                                    <i class="fas fa-credit-card me-2"></i>
+                                    <span>Kredi Kartı</span>
+                                    <div class="card-icons">
+                                        <i class="fab fa-cc-visa"></i>
+                                        <i class="fab fa-cc-mastercard"></i>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="payment-option">
+                                <input type="radio" class="form-check-input" id="bankTransfer" name="paymentMethod" value="bankTransfer">
+                                <label for="bankTransfer" class="payment-label">
+                                    <i class="fas fa-university me-2"></i>
+                                    <span>Banka Havalesi</span>
+                                </label>
+                            </div>
+                            <div class="payment-option">
+                                <input type="radio" class="form-check-input" id="cashOnDelivery" name="paymentMethod" value="cashOnDelivery">
+                                <label for="cashOnDelivery" class="payment-label">
+                                    <i class="fas fa-truck me-2"></i>
+                                    <span>Kapıda Ödeme</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Kredi Kartı Detayları -->
+                        <div id="creditCardDetails" class="credit-card-form">
+                            <div class="row g-3 mt-3">
+                                <div class="col-12">
+                                    <label for="cardNumber" class="form-label">Kart Numarası</label>
+                                    <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="cardName" class="form-label">Kart Üzerindeki İsim</label>
+                                    <input type="text" class="form-control" id="cardName" placeholder="AD SOYAD">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="cardExpiry" class="form-label">Son Kullanma</label>
+                                    <input type="text" class="form-control" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="cardCvv" class="form-label">CVV</label>
+                                    <input type="text" class="form-control" id="cardCvv" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sipariş Notu -->
+                    <div class="order-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-sticky-note me-2"></i>
+                            Sipariş Notu (Opsiyonel)
+                        </h4>
+                        <textarea class="form-control" id="orderNote" rows="3" placeholder="Siparişinizle ilgili özel taleplerinizi buraya yazabilirsiniz..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Taraf - Sipariş Özeti -->
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h4 class="section-title">
+                        <i class="fas fa-list me-2"></i>
+                        Sipariş Özeti
+                    </h4>
+                    
+                    <div id="orderItems" class="order-items">
+                        <!-- JavaScript ile doldurulacak -->
+                    </div>
+
+                    <div class="order-calculation">
+                        <div class="calc-row">
+                            <span>Ara Toplam:</span>
+                            <span id="subtotal">₺0.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>Kargo:</span>
+                            <span id="shipping">₺15.00</span>
+                        </div>
+                        <div class="calc-row total">
+                            <span>Toplam:</span>
+                            <span id="total">₺0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="delivery-info">
+                        <div class="delivery-option active">
+                            <i class="fas fa-truck me-2"></i>
+                            <div>
+                                <strong>Standart Teslimat</strong>
+                                <small>2-3 iş günü</small>
+                            </div>
+                            <span>₺15.00</span>
+                        </div>
+                        <div class="delivery-option">
+                            <i class="fas fa-bolt me-2"></i>
+                            <div>
+                                <strong>Hızlı Teslimat</strong>
+                                <small>1-2 iş günü</small>
+                            </div>
+                            <span>₺25.00</span>
+                        </div>
+                    </div>
+
+                    <div class="order-actions">
+                        <button class="btn btn-success btn-lg w-100 mb-3" onclick="completeOrder()">
+                            <i class="fas fa-check me-2"></i>
+                            Siparişi Tamamla
+                        </button>
+                        <a href="index.html" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Alışverişe Devam Et
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/bootstrap 5.3/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/javascript/order.js"></script>
+</body>
+</html> 

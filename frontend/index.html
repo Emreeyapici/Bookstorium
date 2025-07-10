@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookstorium</title>
+    <link rel="stylesheet" href="assets/bootstrap 5.3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  </head>
+  <body>
+    <nav style="background-color: #005a5b" class="navbar navbar-expand-lg shadow-lg">
+      <div class="container">
+        <a href="index.html" class="text-white navbar-brand fw-bold">
+          <img src="assets/images/Book-image.png" alt="Kitap İkonu" width="40" height="40" class="me-2" />
+          Bookstorium
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <!-- Search Form -->
+          <form class="d-flex mx-auto my-2 my-lg-0" style="width: 100%; max-width: 500px;">
+            <div class="input-group">
+              <input type="search" class="form-control" placeholder="Kitap, yazar veya kategori ara..." aria-label="Arama">
+              <button class="btn btn-outline-light" type="submit">
+                <i class="fas fa-search"></i> Ara
+              </button>
+            </div>
+          </form>
+
+          <!-- Navigation Items -->
+          <ul class="navbar-nav ms-auto">
+            <!-- Favorites -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-white me-3" href="#" id="favoritesDropdown" role="button" data-bs-toggle="dropdown">
+                <i class="fas fa-heart"></i> Favoriler <span class="badge bg-danger">0</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <!-- JS ile doldurulacak -->
+              </ul>
+            </li>
+
+            <!-- Cart -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-white me-3" href="#" id="cartDropdown" role="button" data-bs-toggle="dropdown">
+                <i class="fas fa-shopping-cart"></i> Sepet <span class="badge bg-success">0</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" style="min-width: 300px;">
+                <!-- JS ile doldurulacak -->
+              </ul>
+            </li>
+
+            <!-- User Account -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                <i class="fas fa-user"></i> Hesap
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><h6 class="dropdown-header">Hoş Geldiniz!</h6></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+                  <i class="fas fa-sign-in-alt"></i> Giriş Yap</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#signupModal">
+                  <i class="fas fa-user-plus"></i> Üye Ol</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header">Üye İşlemleri</h6></li>
+                <li><a class="dropdown-item" href="#">
+                  <i class="fas fa-user-edit"></i> Profil Düzenle</a></li>
+                <li><a class="dropdown-item" href="profile-orders.html">
+                  <i class="fas fa-list-alt"></i> Siparişlerim
+                </a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                  <i class="fas fa-user-times"></i> Hesap Sil</a></li>
+                <li><a class="dropdown-item" href="#">
+                  <i class="fas fa-sign-out-alt"></i> Çıkış Yap</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #005a5b;">
+            <h5 class="modal-title text-white">Giriş Yap</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="loginEmail" class="form-label">E-posta</label>
+                <input type="email" class="form-control" id="loginEmail" required>
+              </div>
+              <div class="mb-3">
+                <label for="loginPassword" class="form-label">Şifre</label>
+                <input type="password" class="form-control" id="loginPassword" required>
+              </div>
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">Beni Hatırla</label>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            <button type="button" class="btn" style="background-color: #005a5b; color: white;">Giriş Yap</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal fade" id="signupModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #005a5b;">
+            <h5 class="modal-title text-white">Üye Ol</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="signupName" class="form-label">Ad Soyad</label>
+                <input type="text" class="form-control" id="signupName" required>
+              </div>
+              <div class="mb-3">
+                <label for="signupEmail" class="form-label">E-posta</label>
+                <input type="email" class="form-control" id="signupEmail" required>
+              </div>
+              <div class="mb-3">
+                <label for="signupPassword" class="form-label">Şifre</label>
+                <input type="password" class="form-control" id="signupPassword" required>
+              </div>
+              <div class="mb-3">
+                <label for="signupPasswordConfirm" class="form-label">Şifre Tekrar</label>
+                <input type="password" class="form-control" id="signupPasswordConfirm" required>
+              </div>
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="acceptTerms" required>
+                <label class="form-check-label" for="acceptTerms">Kullanım şartlarını kabul ediyorum</label>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            <button type="button" class="btn" style="background-color: #005a5b; color: white;">Üye Ol</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger">
+            <h5 class="modal-title text-white">Hesap Silme</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-danger">
+              <strong>Dikkat!</strong> Bu işlem geri alınamaz. Hesabınız kalıcı olarak silinecektir.
+            </div>
+            <form>
+              <div class="mb-3">
+                <label for="deletePassword" class="form-label">Şifrenizi doğrulayın</label>
+                <input type="password" class="form-control" id="deletePassword" required>
+              </div>
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="confirmDelete" required>
+                <label class="form-check-label" for="confirmDelete">Hesabımı silmek istediğimi onaylıyorum</label>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            <button type="button" class="btn btn-danger">Hesabı Sil</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container py-5">
+      <div class="products-container">
+        <div class="row g-4">
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/1.jpg" class="card-img-top" alt="Kitap 1" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Fareler ve İnsanlar</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺149.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/2.jpg" class="card-img-top" alt="Kitap 2" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Hayvan Çiftliği</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺99.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/3.jpg" class="card-img-top" alt="Kitap 3" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Harry Potter ve Felsefe Taşı</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺119.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/4.jpg" class="card-img-top" alt="Kitap 4" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Hobbit</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺199.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/5.jpg" class="card-img-top" alt="Kitap 5" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Game of Thrones</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺89.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/6.jpg" class="card-img-top" alt="Kitap 6" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Sherlock Holmes</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺109.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/7.jpg" class="card-img-top" alt="Kitap 7" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Yabancı</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺79.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/8.jpg" class="card-img-top" alt="Kitap 8" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Martin Eden</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺49.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/9.jpg" class="card-img-top" alt="Kitap 9" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Metro 2033</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺129.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/10.jpg" class="card-img-top" alt="Kitap 10" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Don Kişot</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺79.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/11.jpg" class="card-img-top" alt="Kitap 11" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Stephen King - O</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺159.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card product-card h-100">
+              <img src="assets/images/12.jpg" class="card-img-top" alt="Kitap 12" style="height:180px; width:100%; object-fit:contain;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Yüzüklerin Efendisi</h5>
+                <p class="card-text">Bu kitap, etkileyici bir hikaye ve güçlü karakterlerle dolu.</p>
+                <p class="price">₺249.90</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn btn-outline-danger">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="assets/bootstrap 5.3/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/javascript/main.js"></script>
+  </body>
+</html>

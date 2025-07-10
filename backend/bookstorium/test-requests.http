@@ -1,0 +1,8 @@
+### Create a new book
+POST http://localhost:8080/api/books
+Content-Type: application/json
+
+{
+  "title": "Otostopcunun Galaksi Rehberi",
+  "author": "Douglas Adams"
+}

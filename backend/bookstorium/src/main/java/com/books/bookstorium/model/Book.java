@@ -1,5 +1,6 @@
 package com.books.bookstorium.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
@@ -11,11 +12,16 @@ public class Book implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonProperty("title")
     private String title;
+    
+    @JsonProperty("author")
     private String author;
+    
+    @JsonProperty("imageUrl")
     private String imageUrl;
 
-
+    @JsonProperty("price")
     private double price;
 
     public Book() {
@@ -32,4 +38,15 @@ public class Book implements Serializable {
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", price=" + price +
+                '}';
+    }
 }

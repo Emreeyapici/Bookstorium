@@ -1,211 +1,549 @@
-// Bookstorium - Main JavaScript File
-// Developed for e-commerce functionality
+// ======================================================
+//             GLOBAL DEĞİŞKENLER VE SABİTLER
+// ======================================================
+const API_BASE_URL = 'http://localhost:8080/api';
 
-// Global Variables
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-let isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn')) || false;
-let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+// Bu değişkenler, kullanıcının o anki oturum bilgilerini tutar.
+// Sayfa yenilendiğinde sessionStorage'dan (geçici hafıza) okunur.
+let isLoggedIn = JSON.parse(sessionStorage.getItem('isLoggedIn')) || false;
+let currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || null;
 
-// DOM Content Loaded
+// Bu değişkenler, backend'den yüklendikten sonra doldurulur.
+let cart = [];
+let favorites = []; // Favoriler gereksinimini yapana kadar bu satır kalabilir.
+
+// ======================================================
+//             ANA BAŞLANGIÇ NOKTASI
+// ======================================================
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
-    updateCartDisplay();
-    updateFavoritesDisplay();
-    updateUserInterface();
-    attachEventListeners();
 });
 
-// Initialize Application
+// ======================================================
+//             UYGULAMA BAŞLATMA VE OLAY DİNLEYİCİLER
+// ======================================================
 function initializeApp() {
-    console.log('Bookstorium App Initialized');
-    
-    // Create demo user for testing
-    createDemoUser();
-    
-    // Update displays
-    updateCartBadge();
-    updateFavoritesBadge();
-    
-    // Check login status
+    console.log('Bookstorium App Başlatıldı');
+
+    loadBooksFromBackend();
+    updateUserInterface();
+    attachEventListeners();
+    updateUserDropdown(); // BU SATIRI 'if' BLOĞUNUN DIŞINA, YUKARIYA TAŞIDIK.
+
     if (isLoggedIn && currentUser) {
-        updateUserDropdown();
-    }
-}
-
-// Event Listeners
-function attachEventListeners() {
-    // Add to cart buttons
-    document.querySelectorAll('.btn-modern').forEach(button => {
-        if (button.innerHTML.includes('Sepete Ekle')) {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const card = this.closest('.card');
-                const productData = extractProductData(card);
-                addToCart(productData);
-            });
-        }
-    });
-
-    // Add to favorites buttons
-    document.querySelectorAll('.btn-outline-danger').forEach(button => {
-        if (button.innerHTML.includes('fa-heart')) {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const card = this.closest('.card');
-                const productData = extractProductData(card);
-                toggleFavorite(productData);
-                this.classList.toggle('btn-danger');
-                this.classList.toggle('btn-outline-danger');
-            });
-        }
-    });
-
-    // Login form submission
-    document.querySelector('#loginModal .btn[style*="background-color"]').addEventListener('click', handleLogin);
-    
-    // Signup form submission
-    document.querySelector('#signupModal .btn[style*="background-color"]').addEventListener('click', handleSignup);
-    
-    // Delete account
-    document.querySelector('#deleteAccountModal .btn-danger').addEventListener('click', handleDeleteAccount);
-    
-    // Search functionality
-    document.querySelector('form .btn-outline-light').addEventListener('click', handleSearch);
-    
-    // Clear cart and place order buttons will be handled dynamically in updateCartDisplay()
-}
-
-// Extract Product Data from Card
-function extractProductData(card) {
-    const title = card.querySelector('.card-title').textContent;
-    const price = card.querySelector('.price').textContent;
-    const image = card.querySelector('.card-img-top').src;
-    const description = card.querySelector('.card-text').textContent;
-    
-    return {
-        id: generateProductId(title),
-        title: title,
-        price: price,
-        image: image,
-        description: description,
-        quantity: 1
-    };
-}
-
-// Generate unique product ID
-function generateProductId(title) {
-    return title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-}
-
-// Cart Functions
-function addToCart(product) {
-    const existingItem = cart.find(item => item.id === product.id);
-    
-    if (existingItem) {
-        existingItem.quantity += 1;
-        showToast(`${product.title} sepete eklendi! (${existingItem.quantity} adet)`, 'success');
+        // Bu fonksiyonlar sadece giriş yapmış kullanıcılar için çalışmalı
+        fetchCartAndDisplay();
+        fetchFavoritesAndDisplay();
     } else {
-        cart.push(product);
-        showToast(`${product.title} sepete eklendi!`, 'success');
+        // Bunlar da giriş yapmamış kullanıcılar için
+        updateCartDisplay();
+        updateFavoritesDisplay();
     }
-    
-    updateCartStorage();
-    updateCartDisplay();
-    updateCartBadge();
 }
 
-function removeFromCart(productId) {
-    cart = cart.filter(item => item.id !== productId);
-    updateCartStorage();
-    updateCartDisplay();
-    updateCartBadge();
-    showToast('Ürün sepetten kaldırıldı!', 'info');
+function attachEventListeners() {
+    // Statik (her zaman var olan) butonların dinleyicileri
+    document.querySelector('#loginModal .btn[style*="background-color"]').addEventListener('click', handleLogin);
+    document.querySelector('#signupModal .btn[style*="background-color"]').addEventListener('click', handleSignup);
+    document.querySelector('form .btn-outline-light[type="submit"]').addEventListener('click', handleSearch);
+    document.querySelector('#deleteAccountModal .btn-danger').addEventListener('click', handleDeleteAccount);
 }
 
-function updateCartQuantity(productId, change) {
-    const item = cart.find(item => item.id === productId);
-    if (item) {
-        item.quantity += change;
-        if (item.quantity <= 0) {
-            removeFromCart(productId);
-        } else {
-            updateCartStorage();
-            updateCartDisplay();
-            updateCartBadge();
+
+// ======================================================
+//             BACKEND BAĞLANTILI FONKSİYONLAR
+// ======================================================
+
+async function loadBooksFromBackend() {
+    console.log("Backend'e kitap listesi için istek gönderiliyor...");
+    try {
+        const response = await fetch(`${API_BASE_URL}/books`);
+        if (!response.ok) throw new Error('Kitaplar yüklenemedi.');
+
+        const booksFromDb = await response.json();
+        console.log("Backend'den kitaplar başarıyla alındı:", booksFromDb);
+        displayBooksFromBackend(booksFromDb);
+    } catch (error) {
+        console.error("Kitaplar çekilirken bir hata oluştu:", error);
+        const bookListRow = document.getElementById('book-list-row');
+        if(bookListRow) {
+            bookListRow.innerHTML = `<p class="text-danger">${error.message}</p>`;
         }
     }
 }
 
-function clearCart() {
-    cart = [];
-    updateCartStorage();
-    updateCartDisplay();
-    updateCartBadge();
-    showToast('Sepet temizlendi!', 'info');
+async function fetchCartAndDisplay() {
+    if (!isLoggedIn || !currentUser?.id) {
+        cart = [];
+        updateCartDisplay();
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/cart/${currentUser.id}`);
+        if (!response.ok) throw new Error('Sepet verisi alınamadı.');
+
+        cart = await response.json();
+        console.log('Sepet güncellendi:', cart);
+        updateCartDisplay();
+    } catch (error) {
+        console.error('Sepet getirme hatası:', error);
+        showToast('Sepetiniz yüklenemedi.', 'error');
+    }
 }
 
-function updateCartStorage() {
-    localStorage.setItem('cart', JSON.stringify(cart));
+// ======================================================
+//             KULLANICI YÖNETİMİ (Üyelik)
+// ======================================================
+
+async function handleSignup(e) {
+    e.preventDefault();
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password }),
+        });
+        const newUser = await response.json();
+        if (!response.ok) throw new Error(newUser.message || 'Kayıt başarısız oldu.');
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('signupModal'));
+        if (modal) modal.hide();
+
+        showToast(`Hoş geldiniz, ${name}! Hesabınız oluşturuldu.`, 'success');
+        handleLogin(null, { email, password });
+
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+async function handleLogin(e, credentials = null) {
+    if(e) e.preventDefault();
+
+    const email = credentials?.email || document.getElementById('loginEmail').value;
+    const password = credentials?.password || document.getElementById('loginPassword').value;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+        const userData = await response.json();
+        if (!response.ok) throw new Error(userData.message || 'Giriş başarısız.');
+
+        currentUser = { id: userData.id, name: userData.name, email: userData.email };
+        isLoggedIn = true;
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+        if (modal) modal.hide();
+
+        updateUserInterface();
+        updateUserDropdown();
+
+        // Önce sepeti, SONRA favorileri (ve favorilerden sonra kitapları) getir.
+        fetchCartAndDisplay();
+        fetchFavoritesAndDisplay();
+
+        showToast(`Tekrar hoş geldiniz, ${currentUser.name}!`, 'success');
+
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+function logout() {
+    sessionStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('currentUser');
+    isLoggedIn = false;
+    currentUser = null;
+    cart = [];
+    favorites = [];
+
+    updateUserInterface();
+    updateUserDropdown();
+    updateCartDisplay();
+    updateFavoritesDisplay();
+
+
+    // Çıkış yapıldığında, ana sayfadaki kitap listesini de sıfırlayıp yeniden yüklüyoruz.
+    // Bu, kırmızı kalmış kalp butonlarının sıfırlanmasını sağlar.
+    loadBooksFromBackend();
+
+    showToast('Başarıyla çıkış yaptınız!', 'info');
+}
+
+
+async function handleDeleteAccount(e) {
+    e.preventDefault();
+    const confirmDelete = document.getElementById('confirmDelete').checked;
+
+    if (!isLoggedIn || !currentUser?.id) {
+        showToast('Bu işlem için giriş yapmış olmalısınız.', 'error');
+        return;
+    }
+
+    if (!confirmDelete) {
+        showToast('Hesap silme onayını işaretlemelisiniz!', 'error');
+        return;
+    }
+
+    const userIdToDelete = currentUser.id;
+    console.log(`${userIdToDelete} ID'li kullanıcı siliniyor...`);
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/user/${userIdToDelete}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error('Hesap silinirken bir hata oluştu.');
+        }
+
+        // Silme işlemi backend'de başarılı olduysa, şimdi frontend'de çıkış yapıyoruz.
+        showToast('Hesabınız başarıyla kalıcı olarak silindi.', 'success');
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
+        if(modal) modal.hide();
+
+        // Logout fonksiyonumuz zaten oturumu temizleyip arayüzü güncelliyor.
+        logout();
+
+    } catch (error) {
+        console.error('Hesap silme hatası:', error);
+        showToast(error.message, 'error');
+    }
+}
+
+// ======================================================
+//             SEPET FONKSİYONLARI
+// ======================================================
+
+async function addToCart(bookId) {
+    if (!isLoggedIn || !currentUser?.id) {
+        showToast('Sepete ürün eklemek için lütfen giriş yapın.', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/cart/${currentUser.id}/add/${bookId}`, {
+            method: 'POST'
+        });
+        if (!response.ok) throw new Error('Ürün sepete eklenemedi.');
+
+        const addedItem = await response.json();
+        showToast(`'${addedItem.book.title}' sepete eklendi!`, 'success');
+        fetchCartAndDisplay();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+async function removeFromCart(cartItemId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/cart/item/${cartItemId}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Ürün sepetten silinemedi.');
+
+        showToast('Ürün sepetten kaldırıldı.', 'success');
+        fetchCartAndDisplay();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+async function clearCart() {
+    if (!isLoggedIn || !currentUser?.id) {
+        showToast('Bu işlem için giriş yapmalısınız.', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/cart/${currentUser.id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Sepet temizlenemedi.');
+
+        showToast('Sepetiniz tamamen temizlendi.', 'success');
+        fetchCartAndDisplay(); // Arayüzü güncelle
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+async function updateCartQuantity(cartItemId, newQuantity) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/cart/item/${cartItemId}/update?quantity=${newQuantity}`, {
+            method: 'PUT'
+        });
+        if (!response.ok) throw new Error('Miktar güncellenemedi.');
+
+        showToast('Sepetiniz güncellendi.', 'success');
+        fetchCartAndDisplay();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+async function placeOrder() {
+    if (!isLoggedIn || !currentUser?.id) {
+        showToast('Sipariş vermek için lütfen giriş yapın.', 'error');
+        return;
+    }
+
+    if (cart.length === 0) {
+        showToast('Sipariş vermek için sepetinizde ürün olmalı.', 'error');
+        return;
+    }
+
+    const userId = currentUser.id;
+    console.log(`${userId} ID'li kullanıcı sipariş veriyor...`);
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/orders/${userId}`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Sipariş oluşturulurken bir hata oluştu.');
+        }
+
+        const newOrder = await response.json();
+        console.log('Sipariş başarıyla oluşturuldu:', newOrder);
+
+        showToast('Siparişiniz başarıyla alındı!', 'success');
+
+        // Sipariş başarılı olduğu için, frontend'deki sepeti de temizleyip
+        // arayüzü güncelliyoruz. Backend sepeti zaten temizledi, burası arayüzü senkronize etmek için.
+        cart = [];
+        updateCartDisplay();
+
+    } catch (error) {
+        console.error('Sipariş verme hatası:', error);
+        showToast(error.message, 'error');
+    }
+}
+// ======================================================
+//             FAVORİ FONKSİYONLARI
+// ======================================================
+
+async function toggleFavorite(bookId) { // buttonElement parametresini kaldırdık
+    if (!isLoggedIn || !currentUser?.id) {
+        showToast('Favorilere eklemek için lütfen giriş yapın.', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/favorites/${currentUser.id}/toggle/${bookId}`, { method: 'POST' });
+        const result = await response.json();
+        if (!response.ok) throw new Error('İşlem sırasında bir hata oluştu.');
+
+        if (result.isFavorited) {
+            showToast('Kitap favorilere eklendi!', 'success');
+        } else {
+            showToast('Kitap favorilerden çıkarıldı.', 'info');
+        }
+
+        // Favori durumu değiştiği için, hem favori listesini hem de
+        // ana sayfadaki kitap listesini (buton renkleri için) yeniden yükle.
+        fetchFavoritesAndDisplay();
+
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+// ======================================================
+//        YENİ FAVORİ GÖRÜNTÜLEME FONKSİYONLARI
+// ======================================================
+
+// KULLANICININ FAVORİLERİNİ BACKEND'DEN ÇEKEN VE EKRANI GÜNCELLEYEN ANA FONKSİYON
+async function fetchFavoritesAndDisplay() {
+    if (!isLoggedIn || !currentUser?.id) {
+        favorites = [];
+        updateFavoritesDisplay();
+        return;
+    }
+    try {
+        const response = await fetch(`${API_BASE_URL}/favorites/${currentUser.id}`);
+        if (!response.ok) throw new Error('Favori verisi alınamadı.');
+
+        favorites = await response.json(); // Global favori listesini doldur
+        console.log('Favoriler güncellendi:', favorites);
+        updateFavoritesDisplay();
+
+
+        // Favoriler yüklendikten SONRA kitapları yükle ki,
+        // displayBooks fonksiyonu favorileri doğru görsün.
+        loadBooksFromBackend();
+
+    } catch (error) {
+        console.error('Favori getirme hatası:', error);
+    }
+}
+
+// EKRANDAKİ FAVORİLER MENÜSÜNÜ GÜNCELLEYEN FONKSİYON
+function updateFavoritesDisplay() {
+    const favoritesDropdown = document.querySelector('#favoritesDropdown').nextElementSibling;
+    updateFavoritesBadge();
+
+    if (favorites.length === 0) {
+        favoritesDropdown.innerHTML = `<li><div class="dropdown-item text-center">Favoriniz yok</div></li>`;
+        return;
+    }
+
+    let favoritesHTML = '<li><h6 class="dropdown-header">Favorilerim</h6></li>';
+    favorites.forEach(item => {
+        favoritesHTML += `
+            <li>
+                <div class="dropdown-item d-flex justify-content-between align-items-center">
+                    <span>${item.book.title}</span>
+                </div>
+            </li>
+        `;
+    });
+    favoritesDropdown.innerHTML = favoritesHTML;
+}
+
+// EKRANDAKİ FAVORİ İKONUNUN SAYACINI GÜNCELLEYEN FONKSİYON
+function updateFavoritesBadge() {
+    const favoritesBadge = document.querySelector('#favoritesDropdown .badge');
+    if (favoritesBadge) {
+        favoritesBadge.textContent = favorites.length;
+    }
+}
+// ======================================================
+//             ARAMA FONKSİYONU
+// ======================================================
+async function handleSearch(e) {
+    e.preventDefault();
+    const searchTerm = document.querySelector('input[type="search"]').value;
+
+    if (!searchTerm) {
+        loadBooksFromBackend();
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/books/search?query=${encodeURIComponent(searchTerm)}`);
+        if (!response.ok) throw new Error('Arama sırasında bir hata oluştu.');
+
+        const foundBooks = await response.json();
+        showToast(`${foundBooks.length} ürün bulundu.`, 'info');
+        displayBooksFromBackend(foundBooks);
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+// ======================================================
+//             ARAYÜZ GÜNCELLEME FONKSİYONLARI
+// ======================================================
+
+function displayBooksFromBackend(books) {
+    const bookListRow = document.getElementById('book-list-row');
+    bookListRow.innerHTML = '';
+
+    if (books.length === 0) {
+        bookListRow.innerHTML = '<div class="col-12"><p>Gösterilecek kitap bulunamadı.</p></div>';
+        return;
+    }
+
+    books.forEach(book => {
+        const isFavorite = favorites.some(favItem => favItem.book.id === book.id);
+        const favoriteBtnClass = isFavorite ? 'btn-danger' : 'btn-outline-danger';
+
+        const bookColumn = document.createElement('div');
+        bookColumn.className = 'col-sm-6 col-md-4 col-lg-3 d-flex';
+        bookColumn.innerHTML = `
+            <div class="card product-card h-100 w-100">
+              <img src="${book.imageUrl || 'assets/images/Book-image.png'}" class="card-img-top" alt="${book.title}" style="height:250px; width:100%; object-fit:contain; padding-top: 15px;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">${book.title}</h5>
+                <p class="card-text">${book.author}</p>
+                <p class="price">₺${book.price ? book.price.toFixed(2) : 'N/A'}</p>
+                <div class="d-flex gap-2 mt-auto">
+                  <button class="btn btn-modern flex-fill add-to-cart-btn" data-book-id="${book.id}">
+                    <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                  </button>
+                  <button class="btn ${favoriteBtnClass} favorite-btn" data-book-id="${book.id}">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+        `;
+        bookListRow.appendChild(bookColumn);
+    });
+
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function() { addToCart(this.dataset.bookId); });
+    });
+
+    // Favori butonu dinleyicisini güncelledik. Artık butonu yollamıyor.
+    document.querySelectorAll('.favorite-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            toggleFavorite(this.dataset.bookId);
+        });
+    });
 }
 
 function updateCartDisplay() {
     const cartDropdown = document.querySelector('#cartDropdown').nextElementSibling;
-    
+    updateCartBadge();
+
     if (cart.length === 0) {
-        cartDropdown.innerHTML = `
-            <li><h6 class="dropdown-header">Sepetim</h6></li>
-            <li><div class="cart-empty">Sepetiniz boş</div></li>
-        `;
+        cartDropdown.innerHTML = `<li><div class="dropdown-item text-center">Sepetiniz boş</div></li>`;
         return;
     }
 
-    let cartHTML = '<li><h6 class="dropdown-header">Sepetim</h6></li>';
-    
+    let cartHTML = '<li><h6 class="dropdown-header">Sepetim</h6></li><li><hr class="dropdown-divider"></li>';
+    let totalAmount = 0;
+
     cart.forEach(item => {
+        const itemTotal = item.book.price * item.quantity;
+        totalAmount += itemTotal;
         cartHTML += `
             <li>
-                <div class="cart-item">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="flex-grow-1">
-                            <div class="cart-item-title">${item.title}</div>
-                            <div class="cart-item-price">${item.price} × ${item.quantity} adet</div>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="quantity-controls">
-                                <button class="quantity-btn quantity-btn-minus" onclick="updateCartQuantity('${item.id}', -1)">−</button>
-                                <span class="quantity-display">${item.quantity}</span>
-                                <button class="quantity-btn quantity-btn-plus" onclick="updateCartQuantity('${item.id}', 1)">+</button>
-                            </div>
-                            <button class="remove-btn" onclick="removeFromCart('${item.id}')" title="Sepetten kaldır">×</button>
-                        </div>
+                <div class="dropdown-item d-flex justify-content-between align-items-center">
+                    <span class="me-2">${item.book.title} (x${item.quantity})</span>
+                    <div class="d-flex align-items-center">
+                        <span class="me-3 fw-bold">₺${itemTotal.toFixed(2)}</span>
+                        <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                        <span class="mx-2">${item.quantity}</span>
+                        <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                        <button class="btn btn-sm btn-outline-danger ms-2 py-0 px-2" onclick="removeFromCart(${item.id})" title="Sepetten Kaldır">×</button>
                     </div>
                 </div>
             </li>
         `;
     });
 
-    const total = calculateCartTotal();
     cartHTML += `
         <li><hr class="dropdown-divider"></li>
         <li>
-            <div class="cart-total">
-                Toplam: ₺${total.toFixed(2)}
+            <div class="dropdown-item d-flex justify-content-between">
+                <strong>Toplam:</strong>
+                <strong class="text-success">₺${totalAmount.toFixed(2)}</strong>
             </div>
         </li>
+        <li><hr class="dropdown-divider"></li>
         <li>
-            <div class="cart-actions">
-                <button class="cart-action-btn cart-order-btn" onclick="placeOrder()">
-                    <i class="fas fa-check-circle me-1"></i>Sipariş Ver
+            <div class="cart-actions d-flex p-2">
+                <button class="btn btn-success btn-sm flex-fill me-1" onclick="placeOrder()">
+                    <i class="fas fa-check-circle me-1"></i>Siparişi Tamamla
                 </button>
-                <button class="cart-action-btn cart-clear-btn" onclick="clearCart()">
+                <button class="btn btn-danger btn-sm flex-fill ms-1" onclick="clearCart()">
                     <i class="fas fa-trash me-1"></i>Temizle
                 </button>
             </div>
         </li>
     `;
-    
     cartDropdown.innerHTML = cartHTML;
 }
 
@@ -215,292 +553,6 @@ function updateCartBadge() {
     if (cartBadge) {
         cartBadge.textContent = totalItems;
     }
-}
-
-// Favorites Functions
-function toggleFavorite(product) {
-    const existingIndex = favorites.findIndex(item => item.id === product.id);
-    
-    if (existingIndex > -1) {
-        favorites.splice(existingIndex, 1);
-        showToast(`${product.title} favorilerden kaldırıldı!`, 'info');
-    } else {
-        favorites.push(product);
-        showToast(`${product.title} favorilere eklendi!`, 'success');
-    }
-    
-    updateFavoritesStorage();
-    updateFavoritesDisplay();
-    updateFavoritesBadge();
-}
-
-function toggleFavoriteFromDropdown(productId) {
-    const product = favorites.find(item => item.id === productId);
-    if (product) {
-        toggleFavorite(product);
-        
-        // Also update the heart button on the product card if visible
-        const productCards = document.querySelectorAll('.product-card');
-        productCards.forEach(card => {
-            const cardProduct = extractProductData(card);
-            if (cardProduct.id === productId) {
-                const heartButton = card.querySelector('.btn-outline-danger');
-                if (heartButton) {
-                    heartButton.classList.add('btn-outline-danger');
-                    heartButton.classList.remove('btn-danger');
-                }
-            }
-        });
-    }
-}
-
-function updateFavoritesStorage() {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-}
-
-function updateFavoritesDisplay() {
-    const favoritesDropdown = document.querySelector('#favoritesDropdown').nextElementSibling;
-    
-    if (favorites.length === 0) {
-        favoritesDropdown.innerHTML = `
-            <li><h6 class="dropdown-header">Favori Kitaplarım</h6></li>
-            <li><div class="cart-empty">Favori kitabınız yok</div></li>
-        `;
-        return;
-    }
-
-    let favoritesHTML = '<li><h6 class="dropdown-header">Favori Kitaplarım</h6></li>';
-    
-    favorites.forEach(item => {
-        favoritesHTML += `
-            <li>
-                <div class="favorite-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="flex-grow-1">${item.title}</span>
-                        <button class="favorite-remove-btn" onclick="toggleFavoriteFromDropdown('${item.id}')" title="Favorilerden kaldır">
-                            <i class="fas fa-heart-broken"></i>
-                        </button>
-                    </div>
-                </div>
-            </li>
-        `;
-    });
-    
-    favoritesHTML += `
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item text-center" href="#">
-            <i class="fas fa-heart me-2"></i>Tüm Favorileri Gör
-        </a></li>
-    `;
-    
-    favoritesDropdown.innerHTML = favoritesHTML;
-}
-
-function updateFavoritesBadge() {
-    const favoritesBadge = document.querySelector('#favoritesDropdown .badge');
-    if (favoritesBadge) {
-        favoritesBadge.textContent = favorites.length;
-    }
-}
-
-// User Management Functions
-function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    const rememberMe = document.getElementById('rememberMe').checked;
-    
-    if (!email || !password) {
-        showToast('Lütfen tüm alanları doldurun!', 'error');
-        return;
-    }
-    
-    // Find registered user
-    const registeredUser = registeredUsers.find(user => 
-        user.email.toLowerCase() === email.toLowerCase() && user.password === password
-    );
-    
-    if (registeredUser) {
-        currentUser = {
-            email: registeredUser.email,
-            name: registeredUser.name,
-            loginTime: new Date().toISOString()
-        };
-        
-        isLoggedIn = true;
-        localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn));
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        
-        // Close modal and clear form
-        const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
-        modal.hide();
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        document.getElementById('rememberMe').checked = false;
-        
-        updateUserInterface();
-        updateUserDropdown();
-        showToast(`Hoş geldiniz, ${currentUser.name}!`, 'success');
-    } else {
-        showToast('E-posta veya şifre hatalı! Lütfen kayıt olun.', 'error');
-    }
-}
-
-function handleSignup(e) {
-    e.preventDefault();
-    const name = document.getElementById('signupName').value;
-    const email = document.getElementById('signupEmail').value;
-    const password = document.getElementById('signupPassword').value;
-    const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
-    const acceptTerms = document.getElementById('acceptTerms').checked;
-    
-    if (!name || !email || !password || !passwordConfirm) {
-        showToast('Lütfen tüm alanları doldurun!', 'error');
-        return;
-    }
-    
-    if (password !== passwordConfirm) {
-        showToast('Şifreler eşleşmiyor!', 'error');
-        return;
-    }
-    
-    if (!acceptTerms) {
-        showToast('Kullanım şartlarını kabul etmelisiniz!', 'error');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showToast('Şifre en az 6 karakter olmalıdır!', 'error');
-        return;
-    }
-    
-    // Check if email is valid
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        showToast('Geçerli bir e-posta adresi girin!', 'error');
-        return;
-    }
-    
-    // Check if user already exists
-    const existingUser = registeredUsers.find(user => 
-        user.email.toLowerCase() === email.toLowerCase()
-    );
-    
-    if (existingUser) {
-        showToast('Bu e-posta adresi zaten kayıtlı! Giriş yapmayı deneyin.', 'error');
-        return;
-    }
-    
-    // Create new user and save to registered users
-    const newUser = {
-        name: name,
-        email: email,
-        password: password,
-        signupTime: new Date().toISOString()
-    };
-    
-    registeredUsers.push(newUser);
-    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-    
-    // Automatically log in the new user
-    currentUser = {
-        name: newUser.name,
-        email: newUser.email,
-        signupTime: newUser.signupTime
-    };
-    
-    isLoggedIn = true;
-    localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn));
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    
-    // Close modal and clear form
-    const modal = bootstrap.Modal.getInstance(document.getElementById('signupModal'));
-    modal.hide();
-    document.getElementById('signupName').value = '';
-    document.getElementById('signupEmail').value = '';
-    document.getElementById('signupPassword').value = '';
-    document.getElementById('signupPasswordConfirm').value = '';
-    document.getElementById('acceptTerms').checked = false;
-    
-    updateUserInterface();
-    updateUserDropdown();
-    showToast(`Hesabınız oluşturuldu! Hoş geldiniz, ${currentUser.name}!`, 'success');
-}
-
-function handleDeleteAccount(e) {
-    e.preventDefault();
-    const password = document.getElementById('deletePassword').value;
-    const confirmDelete = document.getElementById('confirmDelete').checked;
-    
-    if (!password) {
-        showToast('Lütfen şifrenizi girin!', 'error');
-        return;
-    }
-    
-    if (!confirmDelete) {
-        showToast('Hesap silme onayını işaretleyin!', 'error');
-        return;
-    }
-    
-    // Verify current user's password
-    const registeredUser = registeredUsers.find(user => 
-        user.email.toLowerCase() === currentUser.email.toLowerCase()
-    );
-    
-    if (!registeredUser || registeredUser.password !== password) {
-        showToast('Şifre hatalı!', 'error');
-        return;
-    }
-    
-    // Remove user from registered users
-    registeredUsers = registeredUsers.filter(user => 
-        user.email.toLowerCase() !== currentUser.email.toLowerCase()
-    );
-    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-    
-    // Clear all user data
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('cart');
-    localStorage.removeItem('favorites');
-    
-    isLoggedIn = false;
-    currentUser = null;
-    cart = [];
-    favorites = [];
-    
-    // Close modal and clear form
-    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
-    modal.hide();
-    document.getElementById('deletePassword').value = '';
-    document.getElementById('confirmDelete').checked = false;
-    
-    updateUserInterface();
-    updateCartDisplay();
-    updateFavoritesDisplay();
-    updateCartBadge();
-    updateFavoritesBadge();
-    showToast('Hesabınız başarıyla silindi!', 'info');
-    
-    // Reload page after 2 seconds
-    setTimeout(() => {
-        window.location.reload();
-    }, 2000);
-}
-
-function logout() {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('currentUser');
-    isLoggedIn = false;
-    currentUser = null;
-    
-    updateUserInterface();
-    showToast('Başarıyla çıkış yaptınız!', 'info');
-    
-    // Reload page to reset dropdown menus
-    setTimeout(() => {
-        window.location.reload();
-    }, 1500);
 }
 
 function updateUserInterface() {
@@ -513,84 +565,31 @@ function updateUserInterface() {
 }
 
 function updateUserDropdown() {
-    // Update user dropdown menu based on login status
     const dropdownMenu = document.querySelector('#userDropdown').nextElementSibling;
-    
     if (isLoggedIn && currentUser) {
         dropdownMenu.innerHTML = `
             <li><h6 class="dropdown-header">Hoş Geldiniz, ${currentUser.name}!</h6></li>
-            <li><a class="dropdown-item" href="profile-edit.html">
-              <i class="fas fa-user-edit"></i> Profil Düzenle</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-user-edit"></i> Profil Düzenle</a></li>
             <li><a class="dropdown-item" href="profile-orders.html">
               <i class="fas fa-list-alt"></i> Siparişlerim</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#" onclick="logout()">
-              <i class="fas fa-sign-out-alt"></i> Çıkış Yap</a></li>
-            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-              <i class="fas fa-user-times"></i> Hesap Sil</a></li>
+            <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a></li>
+            <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="fas fa-user-times"></i> Hesabı Sil</a></li>
+        `;
+    } else {
+         dropdownMenu.innerHTML = `
+            <li><h6 class="dropdown-header">Hoş Geldiniz!</h6></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fas fa-sign-in-alt"></i> Giriş Yap</a></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#signupModal"><i class="fas fa-user-plus"></i> Üye Ol</a></li>
         `;
     }
 }
 
-// Search Function
-function handleSearch(e) {
-    e.preventDefault();
-    const searchTerm = document.querySelector('input[type="search"]').value.toLowerCase();
-    
-    if (!searchTerm) {
-        showToast('Lütfen arama terimi girin!', 'error');
-        return;
-    }
-    
-    // Simple search implementation
-    const cards = document.querySelectorAll('.product-card');
-    let foundCount = 0;
-    
-    cards.forEach(card => {
-        const title = card.querySelector('.card-title').textContent.toLowerCase();
-        const description = card.querySelector('.card-text').textContent.toLowerCase();
-        
-        if (title.includes(searchTerm) || description.includes(searchTerm)) {
-            card.closest('.col-sm-6').style.display = 'block';
-            foundCount++;
-        } else {
-            card.closest('.col-sm-6').style.display = 'none';
-        }
-    });
-    
-    showToast(`${foundCount} ürün bulundu: "${searchTerm}"`, 'info');
-}
+// ======================================================
+//             YARDIMCI FONKSİYONLAR (Toast vb.)
+// ======================================================
 
-// Order Functions
-function placeOrder() {
-    if (cart.length === 0) {
-        showToast('Sepetiniz boş!', 'error');
-        return;
-    }
-    
-    if (!isLoggedIn) {
-        showToast('Sipariş vermek için giriş yapmalısınız!', 'error');
-        return;
-    }
-    
-    // Redirect to order page
-    window.location.href = 'order.html';
-}
-
-function calculateCartTotal() {
-    return cart.reduce((total, item) => {
-        const price = parseFloat(item.price.replace('₺', '').replace(',', '.'));
-        return total + (price * item.quantity);
-    }, 0);
-}
-
-function generateOrderId() {
-    return 'ORD' + Date.now().toString().slice(-8);
-}
-
-// Toast Notification System
 function showToast(message, type = 'info') {
-    // Create toast container if not exists
     let toastContainer = document.querySelector('.toast-container');
     if (!toastContainer) {
         toastContainer = document.createElement('div');
@@ -598,87 +597,20 @@ function showToast(message, type = 'info') {
         toastContainer.style.zIndex = '1055';
         document.body.appendChild(toastContainer);
     }
-    
-    // Create toast element
     const toastId = 'toast-' + Date.now();
+    const toastColors = { success: 'success', error: 'danger', info: 'primary' };
+    const toastIcons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
     const toastHTML = `
-        <div id="${toastId}" class="toast align-items-center text-white bg-${getToastColor(type)} border-0" role="alert">
+        <div id="${toastId}" class="toast align-items-center text-white bg-${toastColors[type] || 'info'} border-0" role="alert">
             <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas ${getToastIcon(type)} me-2"></i>
-                    ${message}
-                </div>
+                <div class="toast-body"><i class="fas ${toastIcons[type] || 'fa-info-circle'} me-2"></i>${message}</div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         </div>
     `;
-    
     toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-    
-    // Initialize and show toast
     const toastElement = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastElement, {
-        autohide: true,
-        delay: 3000
-    });
-    
+    const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
     toast.show();
-    
-    // Remove toast element after it's hidden
-    toastElement.addEventListener('hidden.bs.toast', () => {
-        toastElement.remove();
-    });
-}
-
-function getToastColor(type) {
-    const colors = {
-        'success': 'success',
-        'error': 'danger',
-        'info': 'info',
-        'warning': 'warning'
-    };
-    return colors[type] || 'info';
-}
-
-function getToastIcon(type) {
-    const icons = {
-        'success': 'fa-check-circle',
-        'error': 'fa-exclamation-circle',
-        'info': 'fa-info-circle',
-        'warning': 'fa-exclamation-triangle'
-    };
-    return icons[type] || 'fa-info-circle';
-}
-
-// Utility Functions
-function formatPrice(price) {
-    return new Intl.NumberFormat('tr-TR', {
-        style: 'currency',
-        currency: 'TRY'
-    }).format(price);
-}
-
-// Export functions for global access
-window.addToCart = addToCart;
-window.removeFromCart = removeFromCart;
-window.updateCartQuantity = updateCartQuantity;
-window.toggleFavorite = toggleFavorite;
-window.toggleFavoriteFromDropdown = toggleFavoriteFromDropdown;
-window.logout = logout;
-window.clearCart = clearCart;
-window.placeOrder = placeOrder;
-
-// Create demo user for testing (only if no users exist)
-function createDemoUser() {
-    if (registeredUsers.length === 0) {
-        const demoUser = {
-            name: 'Demo Kullanıcı',
-            email: 'demo@bookstorium.com',
-            password: '123456',
-            signupTime: new Date().toISOString()
-        };
-        registeredUsers.push(demoUser);
-        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-        console.log('Demo kullanıcı oluşturuldu: demo@bookstorium.com / 123456');
-    }
+    toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
 }

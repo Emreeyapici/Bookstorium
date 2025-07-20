@@ -1,73 +1,77 @@
-// Siparişlerim Sayfası JS
-
 document.addEventListener('DOMContentLoaded', function() {
-    renderOrders();
-});
+    // Gerekli global değişkenleri ve sabitleri tanımlıyoruz
+    const API_BASE_URL = 'http://localhost:8080/api';
+    const isLoggedIn = JSON.parse(sessionStorage.getItem('isLoggedIn')) || false;
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || null;
 
-function renderOrders() {
-    const ordersList = document.getElementById('ordersList');
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
-    // Sadece giriş yapan kullanıcıya ait ve aktif siparişler
-    const userOrders = currentUser ? allOrders.filter(o => o.user === currentUser.email && (o.status === 'Onaylandı' || o.status === 'Kargoya Verildi')) : [];
-    if (!currentUser) {
-        ordersList.innerHTML = '<div class="alert alert-warning text-center">Siparişlerinizi görmek için giriş yapmalısınız.</div>';
+
+    const ordersContainer = document.getElementById('ordersList');
+
+    // Kullanıcı giriş yapmamışsa, hata göster ve 3 saniye sonra ana sayfaya yönlendir
+    if (!isLoggedIn || !currentUser) {
+        ordersContainer.innerHTML = '<div class="alert alert-danger">Siparişlerinizi görmek için lütfen giriş yapın. Ana sayfaya yönlendiriliyorsunuz...</div>';
+        setTimeout(() => { window.location.href = 'index.html'; }, 3000);
         return;
     }
-    if (userOrders.length === 0) {
-        ordersList.innerHTML = '<div class="alert alert-info text-center">Aktif siparişiniz yok.</div>';
-        return;
+
+    // Backend'den siparişleri çekme fonksiyonunu çağır
+    fetchOrders();
+
+    async function fetchOrders() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/orders/user/${currentUser.id}`);
+            if (!response.ok) {
+                throw new Error('Sipariş geçmişi yüklenemedi.');
+            }
+            const orders = await response.json();
+            displayOrders(orders);
+        } catch (error) {
+            ordersContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+        }
     }
-    let html = '<div class="list-group">';
-    userOrders.slice().reverse().forEach(order => {
-        html += `
-            <a href="#" class="list-group-item list-group-item-action mb-3 shadow-sm rounded-3" data-bs-toggle="modal" data-bs-target="#orderDetailsModal" onclick="showOrderDetails('${order.id}')">
-                <div class="d-flex justify-content-between align-items-center">
+
+    function displayOrders(orders) {
+        const ordersContainer = document.getElementById('ordersList');
+        if (orders.length === 0) {
+            ordersContainer.innerHTML = '<div class="alert alert-info mt-3">Henüz hiç sipariş vermediniz.</div>';
+            return;
+        }
+
+        ordersContainer.innerHTML = '';
+
+        orders.forEach(order => {
+            const orderCard = document.createElement('div');
+            orderCard.className = 'card mb-4 shadow-sm';
+
+            let itemsHtml = '';
+            order.orderItems.forEach(item => {
+                const itemTotal = item.priceAtPurchase * item.quantity;
+                itemsHtml += `<li class="list-group-item d-flex justify-content-between">
+                                <span>${item.book.title} (x${item.quantity})</span>
+                                <span>₺${itemTotal.toFixed(2)}</span>
+                            </li>`;
+            });
+
+            orderCard.innerHTML = `
+                <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap">
                     <div>
-                        <span class="fw-bold">Sipariş No:</span> ${order.id}<br>
-                        <span class="text-muted small">${formatDate(order.date)}</span>
+                        <strong class="text-primary">Sipariş No:</strong> #${order.id}
                     </div>
                     <div>
-                        <span class="badge bg-success me-2">${order.status}</span>
-                        <span class="fw-bold">₺${order.total.toFixed(2)}</span>
+                        <strong class="text-muted">Tarih:</strong> ${new Date(order.orderDate).toLocaleDateString('tr-TR')}
                     </div>
                 </div>
-            </a>
-        `;
-    });
-    html += '</div>';
-    ordersList.innerHTML = html;
-    window.userOrders = userOrders;
-}
-
-function showOrderDetails(orderId) {
-    const order = window.userOrders.find(o => o.id === orderId);
-    if (!order) return;
-    let itemsHtml = '';
-    order.items.forEach(item => {
-        itemsHtml += `<li>${item.title} <span class="text-muted">x${item.quantity}</span> <span class="float-end">₺${(item.price * item.quantity).toFixed(2)}</span></li>`;
-    });
-    document.getElementById('orderDetailsBody').innerHTML = `
-        <div class="mb-3">
-            <strong>Sipariş No:</strong> ${order.id}<br>
-            <strong>Tarih:</strong> ${formatDate(order.date)}<br>
-            <strong>Durum:</strong> <span class="badge bg-success">${order.status}</span><br>
-            <strong>Adres:</strong> ${order.address.address}, ${order.address.district}, ${order.address.city}, ${order.address.postalCode}<br>
-            <strong>Kargo:</strong> ${order.shipping.method} (₺${order.shipping.cost})<br>
-            <strong>Not:</strong> ${order.note || '-'}
-        </div>
-        <ul class="list-group mb-3">
-            ${itemsHtml}
-        </ul>
-        <div class="text-end">
-            <strong>Toplam Tutar: ₺${order.total.toFixed(2)}</strong>
-        </div>
-    `;
-}
-
-function formatDate(dateStr) {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-}
-
-window.showOrderDetails = showOrderDetails; 
+                <div class="card-body">
+                    <h5 class="card-title">Sipariş Edilen Kitaplar</h5>
+                    <ul class="list-group list-group-flush">
+                        ${itemsHtml}
+                    </ul>
+                </div>
+                <div class="card-footer d-flex justify-content-end bg-white">
+                    <strong>Toplam Tutar: <span class="text-success fs-5">₺${order.totalAmount.toFixed(2)}</span></strong>
+                </div>
+            `;
+            ordersContainer.appendChild(orderCard);
+        });
+    }
+});

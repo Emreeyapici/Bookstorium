@@ -28,8 +28,14 @@ public class BookService {
     }
     @CacheEvict(value = "books", allEntries = true)
     public Book save(Book book) {
+        // Debug: Gelen kitap bilgilerini yazdır
+        System.out.println("Gelen kitap bilgileri: " + book);
+        
         // 1. Önce kitabı veritabanına kaydediyoruz.
         Book savedBook = bookRepository.save(book);
+        
+        // Debug: Kaydedilen kitap bilgilerini yazdır
+        System.out.println("Kaydedilen kitap bilgileri: " + savedBook);
 
         // 2. Sonra RabbitMQ'ya bir mesaj gönderiyoruz.
         String message = "Yeni kitap eklendi: ID=" + savedBook.getId() + ", Baslik=" + savedBook.getTitle();
@@ -61,6 +67,11 @@ public class BookService {
         // 2. Bulunan kitabın bilgilerini, dışarıdan gelen yeni bilgilerle güncelliyoruz.
         existingBook.setTitle(bookDetails.getTitle());
         existingBook.setAuthor(bookDetails.getAuthor());
+        existingBook.setPrice(bookDetails.getPrice());
+        existingBook.setImageUrl(bookDetails.getImageUrl());
+
+        // Debug: Güncellenen kitap bilgilerini yazdır
+        System.out.println("Güncellenen kitap bilgileri: " + existingBook);
 
         // 3. Güncellenmiş kitabı veritabanına geri kaydediyoruz.
         // JpaRepository, aynı ID'ye sahip bir nesneyi save() yaparsan, eskisini günceller.

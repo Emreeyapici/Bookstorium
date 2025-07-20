@@ -35,10 +35,21 @@ public class UserService {
     private OrderRepository orderRepository;
 
     public User registerUser(User user) {
+        System.out.println("registerUser çağrıldı: " + user);
+        
+        // Email kontrolü
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            System.out.println("Email zaten kayıtlı: " + user.getEmail());
+            throw new RuntimeException("Bu email adresi zaten kayıtlı: " + user.getEmail());
+        }
+        
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
         System.out.println("Yeni kullanici kaydediliyor: " + user.getEmail());
-        return userRepository.save(user);
+        
+        User savedUser = userRepository.save(user);
+        System.out.println("Kullanıcı başarıyla kaydedildi: " + savedUser.getId());
+        return savedUser;
     }
 
     public User loginUser(String email, String password) {

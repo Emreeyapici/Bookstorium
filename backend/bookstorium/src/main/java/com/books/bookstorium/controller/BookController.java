@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/books") // BÜTÜN ADRESLERİN BAŞINA BUNU OTOMATİK EKLE DİYORUZ
+@RequestMapping("/books") // BÜTÜN ADRESLERİN BAŞINA BUNU OTOMATİK EKLE DİYORUZ
 public class BookController {
 
 

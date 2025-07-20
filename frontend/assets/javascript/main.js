@@ -1,7 +1,7 @@
 // ======================================================
 //             GLOBAL DEĞİŞKENLER VE SABİTLER
 // ======================================================
-const API_BASE_URL = 'http://24.199.93.37:8080/api';
+const API_BASE_URL = 'https://bookstorium.shop/api';
 
 // Bu değişkenler, kullanıcının o anki oturum bilgilerini tutar.
 // Sayfa yenilendiğinde sessionStorage'dan (geçici hafıza) okunur.

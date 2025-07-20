@@ -27,34 +27,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Adım: Global CORS yapılandırmasını (aşağıdaki Bean'den gelen) güvenlik zincirine dahil et.
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-
+                .cors(withDefaults()) // Global CORS yapılandırmasını kullan
                 .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
-                )
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll()
-                );
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll()); // Geliştirme için tüm isteklere izin ver
 
         return http.build();
     }
 
-    // 3. Adım: Global CORS kurallarını tanımlayan Bean.
-    // Spring Security, yukarıdaki .cors(withDefaults()) sayesinde bu Bean'i bulup kullanır.
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*")); // Tüm origin'lere izin ver (test için)
+        // YENİ DEĞİŞİKLİK BURADA: Sadece Vercel adresine izin veriyoruz.
+        configuration.setAllowedOrigins(List.of("https://bookstorium.vercel.app"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);  // Çok önemli
-        configuration.setMaxAge(3600L); // Preflight cache süresi
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }

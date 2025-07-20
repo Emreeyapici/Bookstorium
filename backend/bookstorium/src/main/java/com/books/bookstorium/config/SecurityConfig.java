@@ -47,15 +47,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-            "https://bookstorium.vercel.app", // Vercel frontend
-            "https://bookstorium.shop", // Backend domain (HTTPS)
-            "http://bookstorium.shop", // Backend domain (HTTP)
-            "http://24.199.93.37:8080", // Backend IP
-            "http://localhost:3000", // Geliştirme ortamı
-            "http://localhost:5500", // Live Server
-            "http://127.0.0.1:5500"  // Live Server alternatif
-        ));
+        configuration.setAllowedOriginPatterns(List.of("*")); // Tüm origin'lere izin ver (test için)
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);  // Çok önemli

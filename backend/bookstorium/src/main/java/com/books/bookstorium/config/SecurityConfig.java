@@ -28,7 +28,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // 1. Adım: Global CORS yapılandırmasını (aşağıdaki Bean'den gelen) güvenlik zincirine dahil et.
-                .cors(withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
 
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers

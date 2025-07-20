@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "https://bookstorium.vercel.app")
+
+
 @RestController
 @RequestMapping("/api/books") // BÜTÜN ADRESLERİN BAŞINA BUNU OTOMATİK EKLE DİYORUZ
 public class BookController {
+
 
     @Autowired
     private BookService bookService;

@@ -51,6 +51,7 @@ public class SecurityConfig {
             "https://bookstorium.vercel.app", // Vercel frontend
             "https://bookstorium.shop", // Backend domain (HTTPS)
             "http://bookstorium.shop", // Backend domain (HTTP)
+            "http://24.199.93.37:8080", // Backend IP
             "http://localhost:3000", // Geliştirme ortamı
             "http://localhost:5500", // Live Server
             "http://127.0.0.1:5500"  // Live Server alternatif

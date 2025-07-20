@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Gerekli global değişkenleri ve sabitleri tanımlıyoruz
-    const API_BASE_URL = 'https://bookstorium.shop/api';
+    const API_BASE_URL = 'http://24.199.93.37:8080/api';
     const isLoggedIn = JSON.parse(sessionStorage.getItem('isLoggedIn')) || false;
     const currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || null;
 

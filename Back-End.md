@@ -1,4 +1,4 @@
-Domain Adresi: bookstorium.com
+Domain Adresi: bookstorium.vercel.app
 
 Docker: Kullanıldı.
 

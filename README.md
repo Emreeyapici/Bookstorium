@@ -6,7 +6,7 @@
 
 **Referans Uygulama:** [https://www.dr.com.tr](https://www.dr.com.tr)
 
-**Uygulama Adresi:** [https://bookstorium.site/](https://bookstorium.site/)
+**Uygulama Adresi:** [https://bookstorium.vercel.app/](https://bookstorium.vercel.app/)
 
 **Grup Adı:** knyte
 

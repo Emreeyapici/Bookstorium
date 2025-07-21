@@ -1,4 +1,4 @@
-Frontendi yayınladığım domain adresi: [https://bookstorium.site/](https://bookstorium.vercel.app)
+Frontendi yayınladığım domain adresi: [https://bookstorium.vercel.app](https://bookstorium.vercel.app)
 
 # Emre Yapıcı Frontend
 

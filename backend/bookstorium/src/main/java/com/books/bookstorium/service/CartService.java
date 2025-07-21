@@ -1,6 +1,6 @@
 package com.books.bookstorium.service;
 
-import com.books.bookstorium.model.Book;
+import com.books.bookstorium.entity.Book;
 import com.books.bookstorium.entity.CartItem;
 import com.books.bookstorium.entity.User;
 import com.books.bookstorium.repository.BookRepository;

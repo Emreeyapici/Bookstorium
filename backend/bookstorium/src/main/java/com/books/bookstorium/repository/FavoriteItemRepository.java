@@ -1,6 +1,6 @@
 package com.books.bookstorium.repository;
 
-import com.books.bookstorium.model.Book;
+import com.books.bookstorium.entity.Book;
 import com.books.bookstorium.entity.FavoriteItem;
 import com.books.bookstorium.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,5 @@
 package com.books.bookstorium.entity;
 
-import com.books.bookstorium.model.Book;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.io.Serializable;

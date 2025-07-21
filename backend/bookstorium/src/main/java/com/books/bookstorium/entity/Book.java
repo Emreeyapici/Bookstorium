@@ -1,4 +1,4 @@
-package com.books.bookstorium.model;
+package com.books.bookstorium.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;

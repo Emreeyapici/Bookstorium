@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cart") // Bu controller'daki tüm API'ların adresi /cart ile başlayacak.
+@RequestMapping("/api/cart") // Bu controller'daki tüm API'ların adresi /cart ile başlayacak.
 public class CartController {
 
     @Autowired

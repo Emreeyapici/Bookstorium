@@ -2,11 +2,10 @@ package com.books.bookstorium.service;
 
 import org.springframework.cache.annotation.CacheEvict;
 import com.books.bookstorium.config.RabbitMQConfig;
-import com.books.bookstorium.model.Book;
+import com.books.bookstorium.entity.Book;
 import com.books.bookstorium.repository.BookRepository;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.List;

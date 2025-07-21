@@ -27,10 +27,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(withDefaults()) // Global CORS yapılandırmasını kullan
-                .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll()); // Geliştirme için tüm isteklere izin ver
+                .cors(withDefaults()) // Alttaki corsConfigurationSource Bean'ini kullan
+                .csrf(csrf -> csrf.disable()) // CSRF korumasını kapat
+
+                // YETKİLENDİRME KURALLARI:
+                .authorizeHttpRequests(auth -> auth
+                        // NE OLURSA OLSUN, GELEN TÜM İSTEKLERE İZİN VER.
+                        .anyRequest().permitAll()
+                )
+
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())); // H2 Console için
 
         return http.build();
     }
@@ -38,10 +44,14 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // YENİ DEĞİŞİKLİK BURADA: Sadece Vercel adresine izin veriyoruz.
-        configuration.setAllowedOrigins(List.of("https://bookstorium.vercel.app"));
+        // İzin verdiğimiz adresleri tek tek, açıkça listeliyoruz.
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:63342", // IntelliJ'nin kullandığı yerel adres
+                "http://127.0.0.1:5500"    // Live Server gibi diğer yerel sunucular için
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

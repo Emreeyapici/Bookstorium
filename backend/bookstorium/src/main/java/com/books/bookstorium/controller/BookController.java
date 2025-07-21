@@ -1,6 +1,6 @@
 package com.books.bookstorium.controller;
 
-import com.books.bookstorium.model.Book;
+import com.books.bookstorium.entity.Book;
 import com.books.bookstorium.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,11 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "https://bookstorium.vercel.app")
 
 
 @RestController
-@RequestMapping("/books") // BÜTÜN ADRESLERİN BAŞINA BUNU OTOMATİK EKLE DİYORUZ
+@RequestMapping("/api/books") // BÜTÜN ADRESLERİN BAŞINA BUNU OTOMATİK EKLE DİYORUZ
 public class BookController {
 
 
